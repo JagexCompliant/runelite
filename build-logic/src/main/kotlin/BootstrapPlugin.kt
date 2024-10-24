@@ -4,7 +4,7 @@ import org.gradle.kotlin.dsl.*
 
 class BootstrapPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = with(project) {
-        val bootstrapDependencies by configurations. creating {
+        val bootstrapDependencies by configurations.creating {
             isCanBeConsumed = false
             isCanBeResolved = true
             isTransitive = false
