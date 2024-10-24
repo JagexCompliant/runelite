@@ -1,0 +1,109 @@
+[versions]
+launcherVersion = "3.0.0"
+rlVersion = "1.8.24.3"
+openosrsVersion = "4.31.2"
+rsversion = "206"
+
+cacheversion = "165"
+lombokVersion = "1.18.35"
+
+[libraries]
+runelite-fernflower = {group = "net.runelite", name = "fernflower", version = "20171017"}
+kotlin-gradle-plugin = {group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version = "1.9.23"}
+commons-io = {group = "commons-io", name = "commons-io", version = "_"}
+json = {group = "org.json", name = "json", version = "20220320"}
+lombok = {group = "org.projectlombok", name = "lombok", version = "_"}
+gson = {group = "com.google.code.gson", name = "gson", version = "_"}
+guava = {group = "com.google.guava", name = "guava", version = "_"}
+guice = {group = "com.google.inject", name = "guice", version = "_"}
+okhttp = {group = "com.squareup.okhttp3", name = "okhttp", version = "_"}
+apache-csv = {group = "org.apache.commons", name = "commons-csv", version = "_"}
+apache-compress = {group = "org.apache.commons", name = "commons-compress", version = "_"}
+slf4j-api = {group = "org.slf4j", name = "slf4j-api", version = "_"}
+commons-cli = {group = "commons-cli", name = "commons-cli", version = "_"}
+antlr = {group = "org.antlr", name = "antlr4-runtime", version = "_"}
+mockwebserver = {group = "com.squareup.okhttp3", name = "mockwebserver", version = "_"}
+junit = {group = "junit", name = "junit", version = "_"}
+junit-jupiter-api = {group = "org.junit.jupiter", name = "junit-jupiter-api", version = "_"}
+slf4j-simple = {group = "org.slf4j", name = "slf4j-simple", version = "_"}
+netty-buffer = {group = "io.netty", name = "netty-buffer", version = "_"}
+findbugs = {group = "com.google.code.findbugs", name = "jsr305", version = "_"}
+annotations = {group = "org.jetbrains", name = "annotations", version = "_"}
+bouncycastle = {group = "org.bouncycastle", name = "bcprov-jdk15on", version = "1.52"}
+apache-commons-text = {group = "org.apache.commons", name = "commons-text", version = "_"}
+asm-util = {group = "org.ow2.asm", name = "asm-util", version = "_"}
+asm-tree = {group = "org.ow2.asm", name = "asm-tree", version = "_"}
+asm-commons = {group = "org.ow2.asm", name = "asm-commons", version = "_"}
+rsyntaxtextarea = {group = "com.fifesoft", name = "rsyntaxtextarea", version = "_"}
+fifesoft-autocomplete = {group = "com.fifesoft", name = "autocomplete", version = "_"}
+
+
+pf4j = { group = "org.pf4j", name = "pf4j", version = "_" }
+javax-annotation = { group = "javax.annotation", name = "javax.annotation-api", version = "_" }
+orange-extensions = { group = "net.runelite", name = "orange-extensions", version = "_" }
+logback = { group = "ch.qos.logback", name = "logback-classic", version = "_" }
+protobuf = { group = "com.google.protobuf", name = "protobuf-javalite", version = "_" }
+rxrelay = { group = "com.jakewharton.rxrelay3", name = "rxrelay", version = "_" }
+rxjava = { group = "io.reactivex.rxjava3", name = "rxjava", version = "_" }
+jgroups = { group = "org.jgroups", name = "jgroups", version = "_" }
+jna = { group = "net.java.dev.jna", name = "jna", version = "_" }
+jna-platform = { group = "net.java.dev.jna", name = "jna-platform", version = "_" }
+substance = { group = "net.runelite.pushingpixels", name = "substance", version = "_" }
+jopt-simple = { group = "net.sf.jopt-simple", name = "jopt-simple", version = "_" }
+desktopsupport = { group = "org.madlonkay", name = "desktopsupport", version = "_" }
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version = "_" }
+java-semver = { group = "com.github.zafarkhaja", name = "java-semver", version = "_" }
+slf4j = { group = "org.slf4j", name = "slf4j-api", version = "_" }
+pf4j-update = { group = "org.pf4j", name = "pf4j-update", version = "_" }
+gluegen = { group = "net.runelite.gluegen", name = "gluegen-rt", version = "_" }
+jogl-rl = { group = "net.runelite.jogl", name = "jogl-rl", version = "_" }
+jogl-desktop = { group = "net.runelite.jogl", name = "jogl-gldesktop-dbg", version = "_" }
+jocl = { group = "net.runelite.jocl", name = "jocl", version = "_" }
+trident = { group = "net.runelite.pushingpixels", name = "trident", version = "_" }
+
+
+
+
+
+
+[bundles]
+# Core annotation processors
+annotation-processors = ["lombok", "pf4j"]
+
+# Core compile-only dependencies
+compile-only = ["javax-annotation", "lombok", "orange-extensions"]
+
+# Main implementation dependencies
+implementation-core = [
+    "logback",
+    "gson",
+    "guava",
+    "guice",
+    "protobuf",
+    "rxrelay",
+    "okhttp",
+    "rxjava",
+    "jgroups",
+    "jna",
+    "jna-platform",
+    "substance",
+    "jopt-simple",
+    "desktopsupport",
+    "commons-io",
+    "jetbrains-annotations",
+    "java-semver",
+    "slf4j",
+    "pf4j",
+    "pf4j-update"
+]
+
+# OpenGL/Graphics related dependencies
+graphics = [
+    "gluegen",
+    "jogl-rl",
+    "jogl-desktop",
+    "jocl"
+]
+
+
+asm = ["asm-util", "asm-tree", "asm-commons"]

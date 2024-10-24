@@ -50,9 +50,9 @@ configurations {
 
 dependencies {
     vanillaDep(group = "net.runelite.rs", name = "vanilla", version = ProjectVersions.rsversion.toString())
-    rsapiDep(project(":runescape-api"))
-    rsclientDep(project(":runescape-client"))
-    mixinsDep(project(":runelite-mixins"))
+    rsapiDep(projects.runescapeApi)
+    rsclientDep(projects.runescapeClient)
+    mixinsDep(projects.runeliteMixins)
 }
 
 injector {

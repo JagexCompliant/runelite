@@ -79,8 +79,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
-import net.runelite.client.account.AccountSession;
-import net.runelite.client.account.SessionManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.Subscribe;
@@ -166,8 +164,6 @@ public class GrandExchangePlugin extends Plugin
 	@Inject
 	private Notifier notifier;
 
-	@Inject
-	private SessionManager sessionManager;
 
 	@Inject
 	private ConfigManager configManager;
@@ -279,11 +275,7 @@ public class GrandExchangePlugin extends Plugin
 			keyManager.registerKeyListener(inputListener);
 		}
 
-		AccountSession accountSession = sessionManager.getAccountSession();
-		if (accountSession != null)
-		{
-			grandExchangeClient.setUuid(accountSession.getUuid());
-		}
+
 		else
 		{
 			grandExchangeClient.setUuid(null);
@@ -303,18 +295,7 @@ public class GrandExchangePlugin extends Plugin
 		tradeSeq = 0;
 	}
 
-	@Subscribe
-	public void onSessionOpen(SessionOpen sessionOpen)
-	{
-		AccountSession accountSession = sessionManager.getAccountSession();
-		grandExchangeClient.setUuid(accountSession.getUuid());
-	}
 
-	@Subscribe
-	public void onSessionClose(SessionClose sessionClose)
-	{
-		grandExchangeClient.setUuid(null);
-	}
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)

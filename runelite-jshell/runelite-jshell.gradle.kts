@@ -27,13 +27,13 @@ group = "com.openosrs"
 description = "RuneLite JShell"
 
 dependencies {
-    annotationProcessor(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    compileOnly(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    implementation(group = "com.google.code.findbugs", name = "jsr305", version = "3.0.2")
-    implementation(group = "com.google.inject", name = "guice", version = "5.0.1")
-    implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.1.2")
-    implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
-    implementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
+    with(libs) {
+        annotationProcessor(lombok)
+        compileOnly(lombok)
+        implementation(findbugs)
+        implementation(guice)
+        implementation(rsyntaxtextarea)
+        implementation(fifesoft.autocomplete)
+        implementation(slf4j.api)
+    }
 }

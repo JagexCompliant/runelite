@@ -3,7 +3,7 @@ import java.net.URL;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
-import netscape.javascript.JSObject;
+import ns.javascript.JSObject;
 
 @ObfuscatedName("ke")
 public class class294 {

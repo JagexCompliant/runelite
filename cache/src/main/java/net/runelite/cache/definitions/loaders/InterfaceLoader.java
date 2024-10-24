@@ -196,7 +196,7 @@ public class InterfaceLoader
 			for (var8 = 0; var8 < 5; ++var8)
 			{
 				String var11 = var1.readString();
-				if (var11.length() > 0)
+				if (!var11.isEmpty())
 				{
 					iface.configActions[var8] = var11;
 					iface.clickMask |= 1 << var8 + 23;
@@ -305,7 +305,7 @@ public class InterfaceLoader
 			for (var5 = 0; var5 < 5; ++var5)
 			{
 				String var10 = var1.readString();
-				if (var10.length() > 0)
+				if (!var10.isEmpty())
 				{
 					iface.configActions[var5] = var10;
 					iface.clickMask |= 1 << var5 + 23;
@@ -329,7 +329,7 @@ public class InterfaceLoader
 		if (iface.menuType == 1 || iface.menuType == 4 || iface.menuType == 5 || iface.menuType == 6)
 		{
 			iface.tooltip = var1.readString();
-			if (iface.tooltip.length() == 0)
+			if (iface.tooltip.isEmpty())
 			{
 				if (iface.menuType == 1)
 				{
@@ -537,7 +537,7 @@ public class InterfaceLoader
 				int var5 = var1.readUnsignedByte();
 				if (var5 == 0)
 				{
-					var3[var4] = new Integer(var1.readInt());
+					var3[var4] = var1.readInt();
 				}
 				else if (var5 == 1)
 				{

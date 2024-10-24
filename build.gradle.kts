@@ -23,38 +23,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.ajoberstar.grgit.Grgit
 
-buildscript {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        maven(url = "https://raw.githubusercontent.com/open-osrs/hosting/master")
-    }
-    dependencies {
-        classpath("org.ajoberstar.grgit:grgit-core:4.1.0")
-        classpath("com.openosrs:script-assembler-plugin:1.0.0")
-        classpath("com.openosrs:injector-plugin:2.0.1")
-    }
-}
 
 plugins {
-    id("org.ajoberstar.grgit") version "4.1.0"
-
     application
+    kotlin("jvm")
+    `kotlin-dsl`
+
 }
 
-val localGitCommit: String = try {
-    val projectPath = rootProject.projectDir.absolutePath
-    Grgit.open(mapOf("dir" to projectPath)).head().id
-} catch (_: Exception) {
-    "n/a"
-}
 
 allprojects {
     group = "com.openosrs"
-    version = ProjectVersions.openosrsVersion
-    apply<MavenPublishPlugin>()
+    version = "0.0.01"
+
+    apply(plugin = "java")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
 }
 
 subprojects {
@@ -83,10 +68,11 @@ subprojects {
             }
             filter {
                 includeGroup("net.runelite.rs")
-                includeModule("net.runelite", "discord")
+
                 includeModule("net.runelite", "orange-extensions")
             }
         }
+
         exclusiveContent {
             forRepository {
                 maven {
@@ -101,63 +87,21 @@ subprojects {
         mavenCentral()
     }
 
-    apply<JavaLibraryPlugin>()
-    //apply<MavenPublishPlugin>()
+    apply(plugin = "java-library")
 
-    project.extra["gitCommit"] = localGitCommit
     project.extra["rootPath"] = rootDir.toString().replace("\\", "/")
 
-    if (this.name != "runescape-client") {
-        apply<CheckstylePlugin>()
 
-        configure<CheckstyleExtension> {
-            maxWarnings = 0
-            toolVersion = "9.1"
-            isShowViolations = true
-            isIgnoreFailures = false
-        }
-    }
-
-    configure<PublishingExtension> {
-        repositories {
-            maven {
-                url = uri("$buildDir/repo")
-            }
-            if (System.getenv("REPO_URL") != null) {
-                maven {
-                    url = uri(System.getenv("REPO_URL"))
-                    credentials {
-                        username = System.getenv("REPO_USERNAME")
-                        password = System.getenv("REPO_PASSWORD")
-                    }
-                }
-            }
-        }
-        publications {
-            register("mavenJava", MavenPublication::class) {
-                from(components["java"])
-            }
-        }
-    }
 
     tasks {
-        java {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
-
-        withType<AbstractArchiveTask> {
-            isPreserveFileTimestamps = false
-            isReproducibleFileOrder = true
-            dirMode = 493
-            fileMode = 420
-        }
-
-        withType<JavaCompile> {
+        withType<JavaCompile>().configureEach {
             options.encoding = "UTF-8"
+            sourceCompatibility = JavaVersion.VERSION_21.toString()
+            targetCompatibility = JavaVersion.VERSION_21.toString()
         }
 
-        withType<Checkstyle> {
+
+        withType<Checkstyle>().configureEach {
             group = "verification"
 
             exclude("**/ScriptVarType.java")
@@ -165,25 +109,17 @@ subprojects {
             exclude("**/RoomType.java")
         }
 
-        withType<Jar> {
+        withType<Jar>().configureEach {
             doLast {
-                // sign jar
-                if (System.getProperty("signKeyStore") != null) {
-                    // ensure ant is initialized so we can copy the project variable later
-                    ant.invokeMethod("echo", mapOf("message" to "initializing ant"))
-
-                    for (file in outputs.files) {
-                        org.apache.tools.ant.taskdefs.SignJar().apply {
-                            // why is this required
-                            project = ant.project
-
-                            setKeystore(System.getProperty("signKeyStore"))
-                            setStorepass(System.getProperty("signStorePass"))
-                            setAlias(System.getProperty("signAlias"))
-                            setJar(file)
-                            setSignedjar(file)
-                            execute()
-                        }
+                System.getProperty("signKeyStore")?.let { keyStore ->
+                    ant.withGroovyBuilder {
+                        "signjar"(
+                            "keystore" to keyStore,
+                            "storepass" to System.getProperty("signStorePass"),
+                            "alias" to System.getProperty("signAlias"),
+                            "jar" to outputs.files.singleFile,
+                            "signedjar" to outputs.files.singleFile
+                        )
                     }
                 }
             }
@@ -200,7 +136,6 @@ application {
 tasks {
     named<JavaExec>("run") {
         group = "openosrs"
-
         classpath = project(":runelite-client").sourceSets.main.get().runtimeClasspath
         enableAssertions = true
     }

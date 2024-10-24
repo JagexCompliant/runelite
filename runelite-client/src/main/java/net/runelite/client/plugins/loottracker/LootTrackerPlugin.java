@@ -89,8 +89,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.WidgetID;
-import net.runelite.client.account.AccountSession;
-import net.runelite.client.account.SessionManager;
+
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -309,8 +308,6 @@ public class LootTrackerPlugin extends Plugin
 	@Inject
 	private ClientThread clientThread;
 
-	@Inject
-	private SessionManager sessionManager;
 
 	@Inject
 	private ScheduledExecutorService executor;
@@ -384,27 +381,6 @@ public class LootTrackerPlugin extends Plugin
 	LootTrackerConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(LootTrackerConfig.class);
-	}
-
-	@Subscribe
-	public void onSessionOpen(SessionOpen sessionOpen)
-	{
-		AccountSession accountSession = sessionManager.getAccountSession();
-		if (accountSession.getUuid() != null)
-		{
-			lootTrackerClient.setUuid(accountSession.getUuid());
-		}
-		else
-		{
-			lootTrackerClient.setUuid(null);
-		}
-	}
-
-	@Subscribe
-	public void onSessionClose(SessionClose sessionClose)
-	{
-		submitLoot();
-		lootTrackerClient.setUuid(null);
 	}
 
 	@Subscribe
@@ -548,11 +524,7 @@ public class LootTrackerPlugin extends Plugin
 
 		clientToolbar.addNavigation(navButton);
 
-		AccountSession accountSession = sessionManager.getAccountSession();
-		if (accountSession != null)
-		{
-			lootTrackerClient.setUuid(accountSession.getUuid());
-		}
+
 
 		String profileKey = configManager.getRSProfileKey();
 		if (profileKey != null)

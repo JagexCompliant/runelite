@@ -26,8 +26,10 @@ package net.runelite.http.api.ws.messages;
 
 import java.util.UUID;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import net.runelite.http.api.ws.WebsocketMessage;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class Handshake extends WebsocketMessage
 {

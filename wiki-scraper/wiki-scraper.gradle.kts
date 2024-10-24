@@ -26,22 +26,20 @@
 description = "RuneLite Wiki scraper"
 
 dependencies {
-    api(project(":cache"))
-    api(project(":runelite-api"))
-
-    annotationProcessor(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    compileOnly(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    implementation(group = "org.apache.commons", name = "commons-text", version = "1.9")
-    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.5")
-    implementation(group = "com.google.guava", name = "guava", version = "30.1.1-jre")
+    api(projects.cache)
+    api(projects.runeliteApi)
+    with(libs) {
+    annotationProcessor(lombok)
+    compileOnly(lombok)
+    implementation(apache.commons.text)
+    implementation(guava)
     implementation(group = "com.github.petitparser", name = "java-petitparser", version = "2.3.1")
-    implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.1")
-    implementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
-    implementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.32")
+    implementation(okhttp)
+    implementation(slf4j.api)
+    implementation(slf4j.simple)
 
-    implementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.7.0")
+    implementation(junit.jupiter.api)
+}
 }
 
 tasks {

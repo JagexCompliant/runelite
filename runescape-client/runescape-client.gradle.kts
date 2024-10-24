@@ -27,27 +27,23 @@ group = "com.openosrs.rs"
 description = "RuneScape Client"
 
 dependencies {
-    api(project(":runescape-api"))
-    api(project(":runelite-api"))
+    api(projects.runescapeApi)
+    api(projects.runeliteApi)
+    implementation(projects.injectionAnnotations)
+    implementation(libs.bouncycastle)
+    implementation(libs.json)
 
-    implementation(project(":injection-annotations"))
-    implementation(group = "org.bouncycastle", name = "bcprov-jdk15on", version = "1.52")
-    implementation(group = "org.json", name = "json", version = "20220320")
-
-    testImplementation(group = "junit", name = "junit", version = "4.12")
-    testImplementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
-    testImplementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.32")
 }
 
 tasks {
     java {
         // Needs 1.8 because of lambdas in reflection
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
         disableAutoTargetJvm()
     }
     withType<JavaCompile> {
-        options.compilerArgs.addAll(arrayOf("-g:source,vars,lines", "-Xlint:-unchecked"))
+        options.compilerArgs.addAll(arrayOf("-g:source,vars,lines", "-Xlint:-unchecked","-Xlint:-deprecation"))
     }
     register<JavaExec>("rsc-run") {
         group = "openosrs"

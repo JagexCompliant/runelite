@@ -25,11 +25,13 @@
 package net.runelite.http.api.ws.messages;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import net.runelite.http.api.ws.WebsocketMessage;
 
 /**
  * Called after a successful login to the server
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class LoginResponse extends WebsocketMessage
 {

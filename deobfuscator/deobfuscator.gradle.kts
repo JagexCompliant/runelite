@@ -23,65 +23,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
-plugins {
-    id("com.github.hauner.jarTest") version "1.0.1"
-}
 
 val deobjars: Configuration = configurations.create("deobjars")
 
 configurations {
     testImplementation.get().extendsFrom(deobjars)
 }
-
+repositories {
+       maven(url = uri("https://repo.runelite.net"))
+}
 dependencies {
-    deobjars(group = "net.runelite.rs", name = "vanilla", version = ProjectVersions.rsversion.toString())
-    deobjars(project(":runescape-client"))
+   // deobjars(group = "net.runelite.rs", name = "vanilla", version = ProjectVersions.rsversion.toString())
+    deobjars(projects.runescapeClient)
 
-    annotationProcessor(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
+    annotationProcessor(libs.lombok)
 
-    implementation(project(":runelite-api"))
-    implementation(project(":runescape-api"))
-    implementation(project(":cache"))
-    implementation(group = "org.jetbrains", name = "annotations", version = "22.0.0")
-    implementation(group = "org.ow2.asm", name = "asm", version = "9.0")
-    implementation(group = "org.ow2.asm", name = "asm-util", version = "9.0")
-    implementation(group = "net.runelite", name = "fernflower", version = "07082019")
-    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
-    implementation(group = "com.google.guava", name = "guava", version = "30.1.1-jre")
-    implementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
+    implementation(projects.runeliteApi)
+    implementation(projects.runescapeApi)
+    implementation(projects.cache)
+    with(libs) {
+        implementation(annotations)
+        implementation(bundles.asm)
 
-    runtimeOnly(group = "org.slf4j", name = "slf4j-simple", version = "1.7.32")
-
-    testImplementation(group = "junit", name = "junit", version = "4.12")
-    testImplementation(group = "org.mockito", name = "mockito-core", version = "3.1.0")
+        implementation(gson)
+        implementation(guava)
+        implementation(slf4j.api)
+        runtimeOnly(slf4j.simple)
+    }
 }
 
 tasks {
-    val tokens = mapOf(
-            "rs.version" to ProjectVersions.rsversion.toString(),
-            "vanilla.jar" to deobjars.find { it.name.startsWith("vanilla") }.toString().replace("\\", "/"),
-            "rs.client" to deobjars.find { it.name.startsWith("runescape-client") }.toString().replace("\\", "/")
-    )
 
-    processResources {
-        inputs.properties(tokens)
-
-        filesMatching("deob.properties") {
-            filter(ReplaceTokens::class, "tokens" to tokens)
-            filteringCharset = "UTF-8"
-        }
-    }
-
-    processTestResources {
-        inputs.properties(tokens)
-
-        filesMatching("deob-test.properties") {
-            filter(ReplaceTokens::class, "tokens" to tokens)
-            filteringCharset = "UTF-8"
-        }
-    }
 
     // TODO: Enable assertions on all 3
     register<JavaExec>("Downloader\$main()") {
@@ -96,7 +68,7 @@ tasks {
 
         classpath = project.sourceSets.main.get().runtimeClasspath
         mainClass.set("net.runelite.deob.Deob")
-        args = listOf(tokens["vanilla.jar"], "$buildDir/libs/deobfuscated-$version.jar")
+
     }
 
     register<JavaExec>("UpdateMappings\$main()") {
@@ -104,16 +76,5 @@ tasks {
 
         classpath = project.sourceSets.main.get().runtimeClasspath
         mainClass.set("net.runelite.deob.updater.UpdateMappings")
-    }
-}
-
-publishing {
-    repositories {
-        mavenLocal()
-    }
-    publications {
-        register("asd", MavenPublication::class) {
-            from(components["java"])
-        }
     }
 }

@@ -50,7 +50,7 @@ import net.runelite.api.Client;
 import net.runelite.client.events.SessionClose;
 import net.runelite.client.events.SessionOpen;
 import net.runelite.client.RuneLiteProperties;
-import net.runelite.client.account.SessionManager;
+
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -84,8 +84,6 @@ public class InfoPanel extends PluginPanel
 	@Inject
 	private EventBus eventBus;
 
-	@Inject
-	private SessionManager sessionManager;
 
 	@Inject
 	private ScheduledExecutorService executor;
@@ -163,16 +161,7 @@ public class InfoPanel extends PluginPanel
 		emailLabel.setForeground(Color.WHITE);
 		emailLabel.setFont(smallFont);
 		emailLabel.enableAutoLinkHandler(false);
-		emailLabel.addHyperlinkListener(e ->
-		{
-			if (HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType()) && e.getURL() != null)
-			{
-				if (e.getURL().toString().equals(RUNELITE_LOGIN))
-				{
-					executor.execute(sessionManager::login);
-				}
-			}
-		});
+
 
 		versionPanel.add(rlVersion);
 		versionPanel.add(oprsVersion);
@@ -207,7 +196,6 @@ public class InfoPanel extends PluginPanel
 		add(versionPanel, BorderLayout.NORTH);
 		add(actionsContainer, BorderLayout.CENTER);
 
-		updateLoggedIn();
 		eventBus.register(this);
 	}
 
@@ -293,42 +281,12 @@ public class InfoPanel extends PluginPanel
 		return container;
 	}
 
-	private void updateLoggedIn()
-	{
-		final String name = sessionManager.getAccountSession() != null
-			? sessionManager.getAccountSession().getUsername()
-			: null;
 
-		if (name != null)
-		{
-			emailLabel.setContentType("text/plain");
-			emailLabel.setText(name);
-			loggedLabel.setText("Signed in as");
-			actionsContainer.add(syncPanel, 0);
-		}
-		else
-		{
-			emailLabel.setContentType("text/html");
-			emailLabel.setText("<a href=\"" + RUNELITE_LOGIN + "\">Sign in</a> to sync settings to the cloud.");
-			loggedLabel.setText("Not signed in");
-			actionsContainer.remove(syncPanel);
-		}
-	}
 
 	private static String htmlLabel(String key, String value)
 	{
 		return "<html><body style = 'color:#a5a5a5'>" + key + "<span style = 'color:white'>" + value + "</span></body></html>";
 	}
 
-	@Subscribe
-	public void onSessionOpen(SessionOpen sessionOpen)
-	{
-		updateLoggedIn();
-	}
 
-	@Subscribe
-	public void onSessionClose(SessionClose e)
-	{
-		updateLoggedIn();
-	}
 }

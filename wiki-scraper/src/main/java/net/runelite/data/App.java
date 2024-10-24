@@ -23,8 +23,6 @@
  */
 package net.runelite.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +33,8 @@ import net.runelite.data.dump.MediaWiki;
 import net.runelite.data.dump.wiki.ItemLimitsDumper;
 import net.runelite.data.dump.wiki.ItemStatsDumper;
 import net.runelite.data.dump.wiki.NpcStatsDumper;
+import org.gradle.internal.impldep.com.google.gson.Gson;
+import org.gradle.internal.impldep.com.google.gson.GsonBuilder;
 
 public class App
 {

@@ -73,9 +73,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Constants;
-import net.runelite.client.account.SessionManager;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.discord.DiscordService;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 import net.runelite.client.game.WorldService;
@@ -98,7 +96,6 @@ import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.LoggerFactory;
 
 @Singleton
@@ -136,11 +133,7 @@ public class RuneLite
 	@Inject
 	private ConfigManager configManager;
 
-	@Inject
-	private SessionManager sessionManager;
 
-	@Inject
-	private DiscordService discordService;
 
 	@Inject
 	private ClientSessionManager clientSessionManager;
@@ -391,8 +384,6 @@ public class RuneLite
 		// Load user configuration
 		configManager.load();
 
-		// Load the session, including saved configuration
-		sessionManager.loadSession();
 
 		// Tell the plugin manager if client is outdated or not
 		pluginManager.setOutdated(isOutdated);
@@ -430,8 +421,6 @@ public class RuneLite
 		// Initialize UI
 		clientUI.init();
 
-		// Initialize Discord service
-		discordService.init();
 
 		// Register event listeners
 		eventBus.register(clientUI);
@@ -439,7 +428,6 @@ public class RuneLite
 		eventBus.register(externalPluginManager);
 		eventBus.register(overlayManager);
 		eventBus.register(configManager);
-		eventBus.register(discordService);
 
 		if (!isOutdated)
 		{

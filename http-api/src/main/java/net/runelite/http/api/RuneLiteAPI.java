@@ -27,112 +27,176 @@ package net.runelite.http.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.Instant;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import lombok.Getter;
 import net.runelite.http.api.gson.ColorTypeAdapter;
-import net.runelite.http.api.gson.InstantTypeAdapter;
 import net.runelite.http.api.gson.IllegalReflectionExclusion;
-import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.runelite.http.api.gson.InstantTypeAdapter;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-public class RuneLiteAPI
-{
-	private static final Logger logger = LoggerFactory.getLogger(RuneLiteAPI.class);
-
-	public static final String RUNELITE_AUTH = "RUNELITE-AUTH";
-	public static final String RUNELITE_MACHINEID = "RUNELITE-MACHINEID";
+public class RuneLiteAPI {
 
 	public static OkHttpClient CLIENT;
 	public static final Gson GSON;
 	public static final MediaType JSON = MediaType.parse("application/json");
-	public static String userAgent;
-
 	private static final String BASE = "https://api.runelite.net";
+	private static final String WSBASE = "http://api.runelite.net/ws";
+	private static final String STATICBASE = "http://static.runelite.net";
+	private static final String METEOR_SESSION = "http://session.meteor-client.com";
+	public static String userAgent;
+	@Getter
+    private static String version;
 
-	private static final Properties properties = new Properties();
-	private static String version;
+	private static final String MAVEN_METADATA = "https://repo.runelite.net/net/runelite/runelite-parent/maven-metadata.xml";
+	private static String upstreamVersion = "1.8.19-SNAPSHOT";
 
-	static
-	{
-		try
-		{
-			InputStream in = RuneLiteAPI.class.getResourceAsStream("/runelite.properties");
-			properties.load(in);
+	static {
+		parseMavenVersion();
+		version = upstreamVersion;
+		userAgent = "RuneLite/" + version + "-";
+		OkHttpClient.Builder builder = new OkHttpClient.Builder();
+		List<ConnectionSpec> specs = new ArrayList<>();
+		specs.add(ConnectionSpec.CLEARTEXT);
+		specs.add(ConnectionSpec.MODERN_TLS);
+		specs.add(ConnectionSpec.COMPATIBLE_TLS);
+		builder.connectionSpecs(specs);
 
-			version = properties.getProperty("runelite.version");
-			String commit = properties.getProperty("runelite.commit");
-			boolean dirty = Boolean.parseBoolean(properties.getProperty("runelite.dirty"));
+		CLIENT = builder
+				.pingInterval(30, TimeUnit.SECONDS)
+				.addNetworkInterceptor(new Interceptor() {
 
-			userAgent = "RuneLite/" + version + "-" + commit + (dirty ? "+" : "");
-		}
-		catch (NumberFormatException e)
-		{
-			throw new RuntimeException("Version string has not been substituted; Re-run maven");
-		}
-		catch (IOException ex)
-		{
-			logger.error(null, ex);
-		}
+					@NotNull
+					@Override
+					public Response intercept(@NotNull Chain chain) throws IOException {
+						Request userAgentRequest = chain.request()
+								.newBuilder()
 
-		CLIENT = new OkHttpClient.Builder()
-			.pingInterval(30, TimeUnit.SECONDS)
-			.addNetworkInterceptor(new Interceptor()
-			{
-
-				@Override
-				public Response intercept(Chain chain) throws IOException
-				{
-					Request userAgentRequest = chain.request()
-						.newBuilder()
-						.header("User-Agent", userAgent)
-						.build();
-					return chain.proceed(userAgentRequest);
-				}
-			})
-			.build();
+								.header("User-Agent", userAgent)
+								.build();
+						return chain.proceed(userAgentRequest);
+					}
+				})
+				.build();
 
 		GsonBuilder gsonBuilder = new GsonBuilder();
 
 		gsonBuilder
-			.registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-			.registerTypeAdapter(Color.class, new ColorTypeAdapter());
+				.registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+				.registerTypeAdapter(Color.class, new ColorTypeAdapter());
 
-		boolean assertionsEnabled = false;
-		assert assertionsEnabled = true;
-		if (assertionsEnabled)
-		{
-			IllegalReflectionExclusion jbe = new IllegalReflectionExclusion();
-			gsonBuilder.addSerializationExclusionStrategy(jbe);
-			gsonBuilder.addDeserializationExclusionStrategy(jbe);
-		}
+        IllegalReflectionExclusion jbe = new IllegalReflectionExclusion();
+        gsonBuilder.addSerializationExclusionStrategy(jbe);
+        gsonBuilder.addDeserializationExclusionStrategy(jbe);
 
-		GSON = gsonBuilder.create();
+        GSON = gsonBuilder.create();
 	}
 
-	public static HttpUrl getApiBase()
-	{
+	public static HttpUrl getSessionBase() {
+		return HttpUrl.parse(METEOR_SESSION);
+	}
+
+	public static HttpUrl getApiBase() {
 		final String prop = System.getProperty("runelite.http-service.url");
 
-		if (prop != null && !prop.isEmpty())
-		{
+		if (prop != null && !prop.isEmpty()) {
 			return HttpUrl.parse(prop);
 		}
 
 		return HttpUrl.parse(BASE + "/runelite-" + getVersion());
 	}
 
-	public static String getVersion()
-	{
-		return version;
+	public static HttpUrl getStaticBase() {
+		final String prop = System.getProperty("runelite.static.url");
+
+		if (prop != null && !prop.isEmpty()) {
+			return HttpUrl.parse(prop);
+		}
+
+		return HttpUrl.parse(STATICBASE);
 	}
 
+	public static HttpUrl getWsEndpoint() {
+		final String prop = System.getProperty("runelite.ws.url");
+
+		if (prop != null && !prop.isEmpty()) {
+			return HttpUrl.parse(prop);
+		}
+
+		return HttpUrl.parse(WSBASE);
+	}
+
+    public static void setVersion(String version) {
+		RuneLiteAPI.version = version;
+	}
+
+	private static void parseMavenVersion()
+	{
+		try (ByteArrayInputStream fis = new ByteArrayInputStream(downloadUrl(new URL(MAVEN_METADATA))))
+		{
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setValidating(false);
+			factory.setIgnoringElementContentWhitespace(true);
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(fis);
+			NodeList versionList = doc.getElementsByTagName("version");
+			for (int i = 0; i != versionList.getLength(); i++)
+			{
+				Node node = versionList.item(i);
+				if (node.getTextContent() != null && !node.getTextContent().endsWith("SNAPSHOT"))
+				{
+					upstreamVersion = node.getTextContent();
+				}
+			}
+		}
+		catch (ParserConfigurationException | IOException | SAXException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+
+	private static byte[] downloadUrl(URL toDownload)
+	{
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		InputStream stream;
+		try
+		{
+			byte[] chunk = new byte[4096];
+			int bytesRead;
+			URLConnection conn = toDownload.openConnection();
+			conn.setRequestProperty("User-Agent", userAgent);
+			stream = conn.getInputStream();
+
+			while ((bytesRead = stream.read(chunk)) > 0)
+			{
+				outputStream.write(chunk, 0, bytesRead);
+			}
+			stream.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+
+		return outputStream.toByteArray();
+	}
 }

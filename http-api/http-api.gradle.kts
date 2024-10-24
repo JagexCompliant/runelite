@@ -23,40 +23,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.apache.tools.ant.filters.ReplaceTokens
 
 description = "Web API"
 
 dependencies {
-    annotationProcessor(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
 
-    compileOnly(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.5")
-    implementation(group = "com.google.guava", name = "guava", version = "30.1.1-jre")
-    implementation(group = "com.google.inject", name = "guice", version = "5.0.1")
-    implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.1")
-    implementation(group = "org.apache.commons", name = "commons-csv", version = "1.9.0")
-    implementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
-
-    testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.9.1")
-    testImplementation(group = "junit", name = "junit", version = "4.12")
-    testImplementation(group = "org.slf4j", name = "slf4j-simple", version = "1.7.32")
-}
-
-tasks {
-    processResources {
-        val tokens = mapOf(
-                "projectver" to ProjectVersions.rlVersion,
-                "rsver" to ProjectVersions.rsversion.toString(),
-                "gitcommit" to project.extra["gitCommit"]
-        )
-
-        inputs.properties(tokens)
-
-        filesMatching("runelite.properties") {
-            filter(ReplaceTokens::class, "tokens" to tokens)
-            filteringCharset = "UTF-8"
-        }
+    with(libs) {
+        annotationProcessor(lombok)
+        compileOnly(lombok)
+        implementation(gson)
+        implementation(guava)
+        implementation(guice)
+        implementation(okhttp)
+        implementation(apache.csv)
+        implementation(slf4j.api)
+        testImplementation(mockwebserver)
+        testImplementation(junit)
+        testImplementation(slf4j.simple)
     }
 }

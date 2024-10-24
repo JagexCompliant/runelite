@@ -19,7 +19,7 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 import net.runelite.rs.ScriptOpcodes;
-import netscape.javascript.JSObject;
+import ns.javascript.JSObject;
 
 @Implements("Client")
 @ObfuscatedName("client")

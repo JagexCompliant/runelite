@@ -1,7 +1,7 @@
 import java.applet.Applet;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
-import netscape.javascript.JSObject;
+import ns.javascript.JSObject;
 
 @ObfuscatedName("ak")
 public class class27 {

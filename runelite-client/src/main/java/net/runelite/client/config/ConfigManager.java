@@ -93,7 +93,6 @@ import net.runelite.api.events.PlayerChanged;
 import net.runelite.api.events.UsernameChanged;
 import net.runelite.api.events.WorldChanged;
 import net.runelite.client.RuneLite;
-import net.runelite.client.account.AccountSession;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ClientShutdown;
@@ -129,8 +128,7 @@ public class ConfigManager
 	private final OkHttpClient okHttpClient;
 	private final Gson gson;
 
-	private AccountSession session;
-	private ConfigClient configClient;
+
 	private File propertiesFile;
 
 	@Nullable
@@ -159,7 +157,6 @@ public class ConfigManager
 		this.eventBus = eventBus;
 		this.okHttpClient = okHttpClient;
 		this.client = client;
-		this.propertiesFile = getPropertiesFile();
 		this.gson = gson;
 
 		scheduledExecutorService.scheduleWithFixedDelay(this::sendConfig, 30, 5 * 60, TimeUnit.SECONDS);
@@ -170,41 +167,14 @@ public class ConfigManager
 		return rsProfileKey;
 	}
 
-	public final void switchSession(AccountSession session)
-	{
-		if (session == null)
-		{
-			this.session = null;
-			this.configClient = null;
-		}
-		else
-		{
-			this.session = session;
-		}
 
-		this.propertiesFile = getPropertiesFile();
-
-		load(); // load profile specific config
-	}
 
 	private File getLocalPropertiesFile()
 	{
 		return settingsFileInput;
 	}
 
-	private File getPropertiesFile()
-	{
-		// Sessions that aren't logged in have no username
-		if (session == null || session.getUsername() == null)
-		{
-			return getLocalPropertiesFile();
-		}
-		else
-		{
-			File profileDir = new File(RuneLite.PROFILES_DIR, session.getUsername().toLowerCase());
-			return new File(profileDir, RuneLite.DEFAULT_CONFIG_FILE.getName());
-		}
-	}
+
 
 	public void load()
 	{
@@ -285,11 +255,7 @@ public class ConfigManager
 
 	public Future<Void> importLocal()
 	{
-		if (session == null)
-		{
-			// No session, no import
-			return null;
-		}
+
 
 		final File file = new File(propertiesFile.getParent(), propertiesFile.getName() + "." + TIME_FORMAT.format(new Date()));
 
@@ -1087,14 +1053,7 @@ public class ConfigManager
 				return null;
 			}
 
-			if (configClient != null)
-			{
-				Configuration patch = new Configuration(pendingChanges.entrySet().stream()
-						.map(e -> new ConfigEntry(e.getKey(), e.getValue()))
-						.collect(Collectors.toList()));
 
-				future = configClient.patch(patch);
-			}
 
 			pendingChanges.clear();
 		}

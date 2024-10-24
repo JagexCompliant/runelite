@@ -80,13 +80,13 @@ public class LootTrackerClient
 			.build();
 
 		Request.Builder requestBuilder = new Request.Builder();
-		if (uuid != null)
+/*		if (uuid != null)
 		{
 			requestBuilder.header(RuneLiteAPI.RUNELITE_AUTH, uuid.toString());
 		}
 		requestBuilder.post(RequestBody.create(JSON, GSON.toJson(lootRecords)))
 			.url(url)
-			.build();
+			.build();*/
 
 		client.newCall(requestBuilder.build()).enqueue(new Callback()
 		{
@@ -118,64 +118,11 @@ public class LootTrackerClient
 
 	public Collection<LootAggregate> get() throws IOException
 	{
-		HttpUrl url = apiBase.newBuilder()
-			.addPathSegment("loottracker")
-			.build();
-
-		Request request = new Request.Builder()
-			.header(RuneLiteAPI.RUNELITE_AUTH, uuid.toString())
-			.url(url)
-			.build();
-
-		try (Response response = client.newCall(request).execute())
-		{
-			if (!response.isSuccessful())
-			{
-				log.debug("Error looking up loot: {}", response);
-				return null;
-			}
-
-			InputStream in = response.body().byteStream();
-			return RuneLiteAPI.GSON.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), new TypeToken<List<LootAggregate>>()
-			{
-			}.getType());
-		}
-		catch (JsonParseException ex)
-		{
-			throw new IOException(ex);
-		}
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	public void delete(String eventId)
 	{
-		HttpUrl.Builder builder = apiBase.newBuilder()
-			.addPathSegment("loottracker");
 
-		if (eventId != null)
-		{
-			builder.addQueryParameter("eventId", eventId);
-		}
-
-		Request request = new Request.Builder()
-			.header(RuneLiteAPI.RUNELITE_AUTH, uuid.toString())
-			.delete()
-			.url(builder.build())
-			.build();
-
-		client.newCall(request).enqueue(new Callback()
-		{
-			@Override
-			public void onFailure(Call call, IOException e)
-			{
-				log.warn("unable to delete loot", e);
-			}
-
-			@Override
-			public void onResponse(Call call, Response response)
-			{
-				log.debug("Deleted loot");
-				response.close();
-			}
-		});
 	}
 }

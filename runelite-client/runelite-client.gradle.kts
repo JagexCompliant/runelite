@@ -23,99 +23,92 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.apache.tools.ant.filters.ReplaceTokens
 import java.text.SimpleDateFormat
 import java.util.Date
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("com.openosrs.scriptassembler")
+
+    kotlin("jvm")
     java
 }
 
 repositories {
+    mavenCentral()
     maven {
+        url = uri("https://jitpack.io")
         url = uri("https://repo.runelite.net")
     }
+    maven(uri("https://mvnrepository.com/artifact/net.runelite/fernflower"))
+
 }
 
-apply<BootstrapPlugin>()
+
 
 description = "RuneLite Client"
 
 dependencies {
-    annotationProcessor(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-    annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.6.0")
+    with(libs) {
+    annotationProcessor(lombok)
+    annotationProcessor(pf4j)
 
-    api(project(":runelite-api"))
+    api(projects.runeliteApi)
 
-    compileOnly(group = "javax.annotation", name = "javax.annotation-api", version = "1.3.2")
-    compileOnly(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-    compileOnly(group = "net.runelite", name = "orange-extensions", version = "1.0")
+    compileOnly(javax.annotation)
+    compileOnly(lombok)
+    compileOnly(orange.extensions)
 
-    implementation(project(":http-api"))
-    implementation(project(":runelite-jshell"))
-    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.9")
-    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.5")
-    implementation(group = "com.google.guava", name = "guava", version = "30.1.1-jre") {
+    implementation(projects.httpApi)
+    implementation(projects.runeliteJshell)
+    implementation(logback)
+    implementation(gson)
+    implementation(guava) {
         exclude(group = "com.google.code.findbugs", module = "jsr305")
         exclude(group = "com.google.errorprone", module = "error_prone_annotations")
         exclude(group = "com.google.j2objc", module = "j2objc-annotations")
         exclude(group = "org.codehaus.mojo", module = "animal-sniffer-annotations")
     }
-    implementation(group = "com.google.inject", name = "guice", version = "5.0.1")
-    implementation(group = "com.google.protobuf", name = "protobuf-javalite", version = "3.21.1")
-    implementation(group = "com.jakewharton.rxrelay3", name = "rxrelay", version = "3.0.1")
-    implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.1")
-    implementation(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.1.2")
-    implementation(group = "org.jgroups", name = "jgroups", version = "5.2.2.Final")
-    implementation(group = "net.java.dev.jna", name = "jna", version = "5.9.0")
-    implementation(group = "net.java.dev.jna", name = "jna-platform", version = "5.9.0")
-    implementation(group = "net.runelite", name = "discord", version = "1.4")
-    implementation(group = "net.runelite.pushingpixels", name = "substance", version = "8.0.02")
-    implementation(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
-    implementation(group = "org.madlonkay", name = "desktopsupport", version = "0.6.0")
-    implementation(group = "org.apache.commons", name = "commons-text", version = "1.9")
-    implementation(group = "org.apache.commons", name = "commons-csv", version = "1.9.0")
-    implementation(group = "commons-io", name = "commons-io", version = "2.8.0")
-    implementation(group = "org.jetbrains", name = "annotations", version = "22.0.0")
-    implementation(group = "com.github.zafarkhaja", name = "java-semver", version = "0.9.0")
-    implementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
-    implementation(group = "org.pf4j", name = "pf4j", version = "3.6.0") {
-        exclude(group = "org.slf4j")
+        implementation(guice)
+        implementation(protobuf)
+        implementation(rxrelay)
+        implementation(okhttp)
+        implementation(rxjava)
+        implementation(jgroups)
+        implementation(jna.platform)
+        implementation(jna)
+        implementation(substance)
+        implementation(jopt.simple)
+        implementation(desktopsupport)
+        implementation(apache.commons.text)
+        implementation(apache.csv)
+        implementation(commons.io)
+        implementation(annotations)
+        implementation(java.semver)
+        implementation(slf4j.api)
+        implementation(pf4j) {
+            exclude(group = "org.slf4j")
+        }
+        implementation(pf4j.update)
+        // implementation(group = "com.google.archivepatcher", name = "archive-patch-applier", version= "1.0.4")
+        implementation(gluegen)
+        implementation(jogl.rl)
+        implementation(jogl.desktop)
+        implementation(jocl)
+
+        runtimeOnly(projects.runescapeApi)
+        runtimeOnly(trident)
+        runtimeOnly(gluegen, "natives-linux-amd64")
+        runtimeOnly(gluegen, "natives-windows-amd64")
+        runtimeOnly(gluegen, "natives-windows-i586")
+        runtimeOnly(gluegen, "natives-macosx-universal")
+        runtimeOnly(gluegen, "natives-linux-amd64")
+        runtimeOnly(jogl.rl, "natives-windows-amd64")
+        runtimeOnly(jogl.rl,"natives-windows-i586")
+        runtimeOnly(jogl.rl, "natives-macosx-universal")
+        runtimeOnly(jocl, "macos-x64")
+        runtimeOnly(jocl, "macos-arm64")
+
+
     }
-    implementation(group = "org.pf4j", name = "pf4j-update", version = "2.3.0")
-    // implementation(group = "com.google.archivepatcher", name = "archive-patch-applier", version= "1.0.4")
-    implementation(group = "net.runelite.gluegen", name = "gluegen-rt", version = "2.4.0-rc-20220318")
-    implementation(group = "net.runelite.jogl", name = "jogl-rl", version = "2.4.0-rc-20220318")
-    implementation(group = "net.runelite.jogl", name = "jogl-gldesktop-dbg", version = "2.4.0-rc-20220318")
-    implementation(group = "net.runelite.jocl", name = "jocl", version = "1.0")
-
-    runtimeOnly(project(":runescape-api"))
-    runtimeOnly(group = "net.runelite.pushingpixels", name = "trident", version = "1.5.00")
-    runtimeOnly(group = "net.runelite.gluegen", name = "gluegen-rt", version = "2.4.0-rc-20220318", classifier = "natives-linux-amd64")
-    runtimeOnly(group = "net.runelite.gluegen", name = "gluegen-rt", version = "2.4.0-rc-20220318", classifier = "natives-windows-amd64")
-    runtimeOnly(group = "net.runelite.gluegen", name = "gluegen-rt", version = "2.4.0-rc-20220318", classifier = "natives-windows-i586")
-    runtimeOnly(group = "net.runelite.gluegen", name = "gluegen-rt", version = "2.4.0-rc-20220318", classifier = "natives-macosx-universal")
-    runtimeOnly(group = "net.runelite.jogl", name = "jogl-rl", version = "2.4.0-rc-20220318", classifier = "natives-linux-amd64")
-    runtimeOnly(group = "net.runelite.jogl", name = "jogl-rl", version = "2.4.0-rc-20220318", classifier = "natives-windows-amd64")
-    runtimeOnly(group = "net.runelite.jogl", name = "jogl-rl", version = "2.4.0-rc-20220318", classifier = "natives-windows-i586")
-    runtimeOnly(group = "net.runelite.jogl", name = "jogl-rl", version = "2.4.0-rc-20220318", classifier = "natives-macosx-universal")
-    runtimeOnly(group = "net.runelite.jocl", name = "jocl", version = "1.0", classifier = "macos-x64")
-    runtimeOnly(group = "net.runelite.jocl", name = "jocl", version = "1.0", classifier = "macos-arm64")
-
-    testAnnotationProcessor(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    testCompileOnly(group = "org.projectlombok", name = "lombok", version = ProjectVersions.lombokVersion)
-
-    testImplementation(group = "com.google.inject.extensions", name = "guice-grapher", version = "4.1.0")
-    testImplementation(group = "com.google.inject.extensions", name = "guice-testlib", version = "4.1.0")
-    testImplementation(group = "org.hamcrest", name = "hamcrest-library", version = "1.3")
-    testImplementation(group = "junit", name = "junit", version = "4.12")
-    testImplementation(group = "org.mockito", name = "mockito-core", version = "3.1.0")
-    testImplementation(group = "org.mockito", name = "mockito-inline", version = "3.1.0")
-    testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.9.1")
-    testImplementation(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
 }
 
 fun formatDate(date: Date?) = with(date ?: Date()) {
@@ -130,26 +123,9 @@ fun pluginPath(): String {
 }
 
 tasks {
-    build {
-        finalizedBy("shadowJar")
-    }
 
-    processResources {
-        val tokens = mapOf(
-                "project.version" to ProjectVersions.rlVersion,
-                "rs.version" to ProjectVersions.rsversion.toString(),
-                "open.osrs.version" to ProjectVersions.openosrsVersion,
-                "open.osrs.builddate" to formatDate(Date()),
-                "plugin.path" to pluginPath()
-        )
 
-        inputs.properties(tokens)
 
-        filesMatching("**/*.properties") {
-            filter(ReplaceTokens::class, "tokens" to tokens)
-            filteringCharset = "UTF-8"
-        }
-    }
 
     jar {
         manifest {
@@ -157,11 +133,8 @@ tasks {
         }
     }
 
-    shadowJar {
-        archiveClassifier.set("shaded")
-    }
 
-    assembleScripts {
+/*    assembleScripts {
         val inp = "${projectDir}/src/main/scripts"
         val out = "${buildDir}/scripts/runelite"
 
@@ -170,21 +143,19 @@ tasks {
 
         input.set(file(inp))
         output.set(file(out))
-    }
+    }*/
 
-    processResources {
-        dependsOn("assembleScripts")
-        dependsOn(":injected-client:inject")
+   // processResources {
+    //    dependsOn("assembleScripts")
+      //  dependsOn(":injected-client:inject")
 
-        from("${buildDir}/scripts")
+      //  from("${layout.buildDirectory}/scripts")
 
-        from("${project(":injected-client").buildDir}/libs")
-        from("${project(":injected-client").buildDir}/resources/main")
-    }
+       // from("${project(":injected-client").buildDir}/libs")
+       // from("${project(":injected-client").buildDir}/resources/main")
+  //  }
 
-    withType<BootstrapTask> {
-        group = "openosrs"
-    }
+
 
     register<JavaExec>("RuneLite.main()") {
         group = "openosrs"
@@ -194,3 +165,5 @@ tasks {
         mainClass.set("net.runelite.client.RuneLite")
     }
 }
+
+fun DependencyHandler.runtimeOnly(dep: Provider<MinimalExternalModuleDependency>, classifier: String) = runtimeOnly(dep.get().group, dep.get().name, dep.get().version, classifier =  classifier)

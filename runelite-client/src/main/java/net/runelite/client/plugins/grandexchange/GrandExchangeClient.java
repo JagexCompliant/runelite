@@ -69,14 +69,7 @@ public class GrandExchangeClient
 			.build();
 
 		Request.Builder builder = new Request.Builder();
-		if (uuid != null)
-		{
-			builder.header(RuneLiteAPI.RUNELITE_AUTH, uuid.toString());
-		}
-		if (machineId != null)
-		{
-			builder.header(RuneLiteAPI.RUNELITE_MACHINEID, machineId);
-		}
+
 
 		Request request = builder
 			.post(RequestBody.create(JSON, GSON.toJson(grandExchangeTrade)))

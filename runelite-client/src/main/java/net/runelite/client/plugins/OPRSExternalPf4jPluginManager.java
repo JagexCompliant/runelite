@@ -53,15 +53,9 @@ class OPRSExternalPf4jPluginManager extends DefaultPluginManager
 		{
 			protected Path getManifestPath(Path pluginPath)
 			{
-				if (isDevelopment())
-				{
-					// The superclass performs a find, which is slow in development mode since we're pointing
-					// at a sources directory, which can have a lot of files. The external plugin template
-					// will always output the manifest at the following location, so we can hardcode this path.
-					return pluginPath.resolve(OPRSExternalPluginManager.DEVELOPMENT_MANIFEST_PATH);
-				}
 
-				return super.getManifestPath(pluginPath);
+					return pluginPath.resolve(OPRSExternalPluginManager.DEVELOPMENT_MANIFEST_PATH);
+
 			}
 		};
 	}

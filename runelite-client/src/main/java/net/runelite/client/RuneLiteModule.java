@@ -50,7 +50,6 @@ import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.hooks.Callbacks;
-import net.runelite.client.account.SessionManager;
 import net.runelite.client.callback.Hooks;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ChatColorConfig;
@@ -126,7 +125,6 @@ public class RuneLiteModule extends AbstractModule
 		bind(ItemManager.class);
 		bind(Scheduler.class);
 		bind(PluginManager.class);
-		bind(SessionManager.class);
 
 		bind(Gson.class).toInstance(RuneLiteAPI.GSON);
 
